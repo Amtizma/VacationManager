@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"
+     xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:th="http://www.thymeleaf.org">
+<head>
+ <meta charset="UTF-8">
+ <title>Vacation Manager</title>
+ <link rel='stylesheet' type='text/css'
+       href='https://api.tomtom.com/maps-sdk-for-web/cdn/5.x/5.63.0/maps/maps.css'>
+ <style>
+   #map {
+     width: 100vw;
+     height: 100vh;
+   }
+    #searchbar{
+    margin-left: 15%;
+    padding:15px;
+    border-radius: 10px;
+    }
+
+    input[type=text] {
+    width: 30%;
+    -webkit-transition: width 0.15s ease-in-out;
+    transition: width 0.15s ease-in-out;
+    }
+
+    input[type=text]:focus {
+    width: 70%;
+    }
+ </style>
+ <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/5.x/5.63.0/maps/maps-web.min.js'></script>
+<script>(function(){ window.SS = window.SS || {}; SS.Require = function (callback){ if (typeof callback === 'function') { if (window.SS && SS.EventTrack) { callback(); } else { var siteSpect = document.getElementById('siteSpectLibraries'); var head = document.getElementsByTagName('head')[0]; if (siteSpect === null && typeof head !== 'undefined') { siteSpect = document.createElement('script'); siteSpect.type = 'text/javascript'; siteSpect.src = '/__ssobj/core.js+ssdomvar.js+generic-adapter.js';siteSpect.async = true; siteSpect.id = 'siteSpectLibraries'; head.appendChild(siteSpect); } if (window.addEventListener){ siteSpect.addEventListener('load', callback, false); } else { siteSpect.attachEvent('onload', callback, false); } } } };})(); </script> </head>
+<body>
+<input id="searchbar" onkeyup="search_location()" type="text"
+       name="search" placeholder="Search locations..">
+<div id='map' class='map'></div>
+<script th:inline="javascript">
+ var map = tt.map({
+   key: [[${apikey}]], // this will be replaced by Thymeleaf at runtime
+   container: 'map',
+   style: 'tomtom://vector/1/basic-main',
+   center: [20, 57.2787],
+   zoom: 3
+ });
+ const popupOffsets = {
+ top: [0, 0],
+ bottom: [0, -50],
+ 'bottom-right': [0, -70],
+ 'bottom-left': [0, -70],
+ left: [25, -35],
+ right: [-25, -35]
+}
+// placeholder for data that will be filled in by Thymeleaf
+const coolLocations = /*[[${coolLocations}]]*/ null;
+coolLocations.forEach(location => {
+ const marker = new tt.Marker().setLngLat(location.lnglat).addTo(map);
+ const popup = new tt.Popup({offset: popupOffsets}).setHTML(location.description);
+ marker.setPopup(popup).togglePopup();
+});
+ map.addControl(new tt.FullscreenControl());
+ map.addControl(new tt.NavigationControl());
+</script>
+</body>
+</html>
