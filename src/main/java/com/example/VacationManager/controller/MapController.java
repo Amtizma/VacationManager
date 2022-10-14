@@ -52,7 +52,7 @@ public class MapController {
     public String homePage(Model model) {
         model.addAttribute("apikey", tomTomApiKey);
         model.addAttribute("coolLocations", coolLocations());
-        return "test";
+        return "home";
     }
 
 }

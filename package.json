@@ -8,9 +8,13 @@
   },
   "keywords": [],
   "author": "",
+  "type": "module",
   "license": "ISC",
   "devDependencies": {
     "lite": "^4.0.5",
     "server": "^1.0.37"
+  },
+  "dependencies": {
+    "fs-js": "^1.0.6"
   }
 }
