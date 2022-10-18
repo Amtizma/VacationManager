@@ -3,19 +3,22 @@ package com.example.VacationManager.controller;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.List;
 
 @Controller
 public class MapController {
-    private static class Location {
+    public static class Location {
         private final double[] lnglat;
         private final String description;
         public Location(double[] lnglat, String description) {
             this.lnglat = lnglat;
             this.description = description;
         }
+
 
         public double[] getLnglat() {
             return lnglat;
@@ -26,7 +29,7 @@ public class MapController {
         }
 
     }
-    private List<Location> coolLocations() {
+    public List<Location> coolLocations() {
         return List.of(
                 new Location(new double[]{2.349014, 48.864716}, "Paris"),
                 new Location(new double[]{2.154007, 41.390205}, "Barcelona"),
@@ -41,18 +44,19 @@ public class MapController {
                 new Location(new double[]{4.351721, 50.85034}, "Brussels"),
                 new Location(new double[]{14.418540, 50.073658}, "Prague"),
                 new Location(new double[]{12.568337, 55.676098}, "Copenhagen")
-
-
         );
     }
     @Value("${tomtom.apikey}")
     private String tomTomApiKey;
 
     @GetMapping("/")
-    public String homePage(Model model) {
+    public String homePage(Model model) throws IOException, InterruptedException {
         model.addAttribute("apikey", tomTomApiKey);
         model.addAttribute("coolLocations", coolLocations());
+        model.addAttribute("hotelList", Hotels.hotelsList);
+        model.addAttribute("returnHotels", new Hotels().returnHotels(new City().getCity()));
         return "home";
     }
+
 
 }
