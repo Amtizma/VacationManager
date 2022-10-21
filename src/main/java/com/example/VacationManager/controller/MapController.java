@@ -11,6 +11,7 @@ import java.util.List;
 
 @Controller
 public class MapController {
+    Hotels hotels = new Hotels();
     public static class Location {
         private final double[] lnglat;
         private final String description;
@@ -50,12 +51,22 @@ public class MapController {
     private String tomTomApiKey;
 
     @GetMapping("/")
-    public String homePage(Model model) throws IOException, InterruptedException {
+    public String sendReport(@RequestParam(value = "cityName", required = false) String cityName,
+                                   @RequestParam(value = "startDate", required = false) String startDate,
+                                   @RequestParam(value = "endDate", required = false) String endDate,
+                                   @RequestParam(value = "nrofppl", required = false) String nrofppl,
+                                   @RequestParam(value = "nrofrooms", required = false) String nrofrooms,
+                                   Model model) throws IOException, InterruptedException {
         model.addAttribute("apikey", tomTomApiKey);
         model.addAttribute("coolLocations", coolLocations());
         model.addAttribute("hotelList", Hotels.hotelsList);
-        model.addAttribute("returnHotels", new Hotels().returnHotels(new City().getCity()));
-        return "home";
+        model.addAttribute("cityName", cityName);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("nrofppl", nrofppl);
+        model.addAttribute("nrofrooms", nrofrooms);
+        model.addAttribute("returnHotels", hotels.returnHotels(cityName, startDate, endDate, nrofrooms, nrofppl));
+       return "home";
     }
 
 

@@ -64,7 +64,8 @@ import java.net.http.HttpResponse;
         public Hotels() {
         }
 
-        public List<Hotels> returnHotels(String city) throws IOException, InterruptedException {
+        public List<Hotels> returnHotels(String city, String startDate, String endDate, String nrofrooms, String nrofppl) throws IOException, InterruptedException {
+            hotelsList.clear();
             double[] lnglat = new double[2];
             MapController controller = new MapController();
             for (int i = 0; i <controller.coolLocations().size(); i++) {
@@ -72,17 +73,15 @@ import java.net.http.HttpResponse;
                     lnglat = controller.coolLocations().get(i).getLnglat();
                 }
             }
-            /*
             HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=popularity&adults_number=2&units=metric&room_number=1&checkout_date=2022-11-15&filter_by_currency=RON&locale=en-gb&checkin_date=2022-11-12&latitude="+lnglat[1]+"&longitude="+lnglat[0]))
+				.uri(URI.create("https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=popularity&adults_number="+ nrofppl + "&units=metric&room_number="+ nrofrooms+"&checkout_date="+endDate+"&filter_by_currency=RON&locale=en-gb&checkin_date="+startDate+"&latitude="+lnglat[1]+"&longitude="+lnglat[0]))
 				.header("X-RapidAPI-Key", "1fb99e2302msh01a84d95d59109cp1cc453jsn32731c716e00")
 				.header("X-RapidAPI-Host", "booking-com.p.rapidapi.com")
 				.method("GET", HttpRequest.BodyPublishers.noBody())
 				.build();
 		    HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-             */
             String content = new String(Files.readAllBytes(Paths.get("test.txt")));
-            String[] datasplit = content.split("\"");
+            String[] datasplit = response.body().split("\"");
             String url = "";
             String hotel_name = "";
             String latitude = "";
@@ -99,8 +98,6 @@ import java.net.http.HttpResponse;
                 if (datasplit[i].equals("max_photo_url")) main_photo_url = datasplit[i+2];
                 if(datasplit[i].equals("max_1440_photo_url"))hotelsList.add(new Hotels(hotel_name, gross_price, longitude, latitude, url, main_photo_url));
             }
-            hotelsList.forEach(System.out::println);
-            System.out.println(city);
             return hotelsList;
         }
         @Override
