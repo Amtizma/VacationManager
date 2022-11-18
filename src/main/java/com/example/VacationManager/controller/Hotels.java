@@ -73,6 +73,7 @@ import java.net.http.HttpResponse;
                     lnglat = controller.coolLocations().get(i).getLnglat();
                 }
             }
+            /*
             HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create("https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=popularity&adults_number="+ nrofppl + "&units=metric&room_number="+ nrofrooms+"&checkout_date="+endDate+"&filter_by_currency=RON&locale=en-gb&checkin_date="+startDate+"&latitude="+lnglat[1]+"&longitude="+lnglat[0]))
 				.header("X-RapidAPI-Key", "1fb99e2302msh01a84d95d59109cp1cc453jsn32731c716e00")
@@ -80,8 +81,10 @@ import java.net.http.HttpResponse;
 				.method("GET", HttpRequest.BodyPublishers.noBody())
 				.build();
 		    HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+             */
             String content = new String(Files.readAllBytes(Paths.get("test.txt")));
-            String[] datasplit = response.body().split("\"");
+            String[] datasplit = content.split("\"");
             String url = "";
             String hotel_name = "";
             String latitude = "";
