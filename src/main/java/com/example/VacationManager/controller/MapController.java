@@ -66,8 +66,8 @@ public class MapController {
                 if (coolLocations().get(i).description.equals(cityName)) lnglat = coolLocations().get(i).lnglat;
             }
 
-        model.addAttribute("location", locations.getLocations(lnglat));
-        model.addAttribute("locationsList", Locations.locationsList);
+       // model.addAttribute("location", locations.getLocations(lnglat));
+       // model.addAttribute("locationsList", Locations.locationsList);
         model.addAttribute("hotelList", Hotels.hotelsList);
         model.addAttribute("cityName", cityName);
         model.addAttribute("startDate", startDate);
