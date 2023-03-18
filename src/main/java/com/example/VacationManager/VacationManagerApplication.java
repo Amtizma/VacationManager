@@ -3,6 +3,7 @@ package com.example.VacationManager;
 
 import com.example.VacationManager.controller.Locations;
 import com.example.VacationManager.controller.LocationsV2;
+import com.example.VacationManager.controller.MapController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

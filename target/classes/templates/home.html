@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en"
-     xmlns="http://www.w3.org/1999/xhtml"
-     xmlns:th="http://www.thymeleaf.org">
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
- <meta charset="UTF-8">
- <title>Vacation Manager</title>
- <link rel='stylesheet' type='text/css'
-       href='https://api.tomtom.com/maps-sdk-for-web/cdn/5.x/5.63.0/maps/maps.css'>
+    <meta charset="UTF-8">
+    <title>Vacation Manager</title>
+    <link rel='stylesheet' type='text/css'
+          href='https://api.tomtom.com/maps-sdk-for-web/cdn/5.x/5.63.0/maps/maps.css'>
     <link rel='stylesheet' type='text/css' href='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.21.3/maps/maps.css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/5.x/5.63.0/maps/maps-web.min.js'></script>
     <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.21.3/services/services-web.min.js'></script>
- <style>
+    <style>
         .marker-icon {
             background-position: center;
             background-size: 22px 22px;
@@ -298,69 +298,74 @@ background-size: 2px 100%;
 background-repeat: no-repeat;
 background-position: center center;
 }
- </style>
-<script>(function(){ window.SS = window.SS || {}; SS.Require = function (callback){ if (typeof callback === 'function') { if (window.SS && SS.EventTrack) { callback(); } else { var siteSpect = document.getElementById('siteSpectLibraries'); var head = document.getElementsByTagName('head')[0]; if (siteSpect === null && typeof head !== 'undefined') { siteSpect = document.createElement('script'); siteSpect.type = 'text/javascript'; siteSpect.src = '/__ssobj/core.js+ssdomvar.js+generic-adapter.js';siteSpect.async = true; siteSpect.id = 'siteSpectLibraries'; head.appendChild(siteSpect); } if (window.addEventListener){ siteSpect.addEventListener('load', callback, false); } else { siteSpect.attachEvent('onload', callback, false); } } } };})(); </script> </head>
+
+    </style>
+    <script>
+        (function(){ window.SS = window.SS || {}; SS.Require = function (callback){ if (typeof callback === 'function') { if (window.SS && SS.EventTrack) { callback(); } else { var siteSpect = document.getElementById('siteSpectLibraries'); var head = document.getElementsByTagName('head')[0]; if (siteSpect === null && typeof head !== 'undefined') { siteSpect = document.createElement('script'); siteSpect.type = 'text/javascript'; siteSpect.src = '/__ssobj/core.js+ssdomvar.js+generic-adapter.js';siteSpect.async = true; siteSpect.id = 'siteSpectLibraries'; head.appendChild(siteSpect); } if (window.addEventListener){ siteSpect.addEventListener('load', callback, false); } else { siteSpect.attachEvent('onload', callback, false); } } } };})();
+    </script>
+</head>
 <body>
-<form id = "startform">
-    <label id = "startlabel" for="startingcityname">City name:</label><br>
+<form id="startform">
+    <label id="startlabel" for="startingcityname">City name:</label><br>
     <input type="text" id="startingcityname" name="startingcityname"><br>
-    <button id = "startmap" type = "button" onclick="togglemap()">Go</button>
+    <button id="startmap" type="button" onclick="togglemap()">Go</button>
 </form>
 <div id="mySidepanelCity" class="sidepanelcity">
     <div class="center">
-    <form hidden id = "citynamesform">
-        <label for="Name1"> Destination City:</label>
-        <input type="text" id="Name1" name="Name1" placeholder="">
-        <button id = "addtotrip" name="addtotrip" type = "button" onclick="addtrip()">Add to trip</button>
-        <button id = "zoomoncity" name="zoomoncity" type = "button" onclick="zoomcity()">Zoom on city</button>
-    </form>
+        <form hidden id="citynamesform">
+            <label for="Name1"> Destination City:</label>
+            <input type="text" id="Name1" name="Name1" placeholder="">
+            <button id="addtotrip" name="addtotrip" type="button" onclick="addtrip()">Add to trip</button>
+            <button id="zoomoncity" name="zoomoncity" type="button" onclick="zoomcity()">Zoom on city</button>
+        </form>
     </div>
 </div>
-<button class="btn" id = "menubutton" onclick="menubutton()"><i class="fa fa-bars"></i> Menu</button>
+<button class="btn" id="menubutton" onclick="menubutton()"><i class="fa fa-bars"></i> Menu</button>
 
 <div id="mySidepanel" class="sidepanel">
-    <button class = "savetopdf" id = "savetopdf" name="savetopdf" type = "button" onclick="savetopdf()">Save to PDF</button>
-    <button class = "showdetails" id = "showdetails" name="showdetails" type = "button" onclick="showdetails()">Show Details</button>
+    <button class="savetopdf" id="savetopdf" name="savetopdf" type="button" onclick="savetopdf()">Save to PDF</button>
+    <button class="showdetails" id="showdetails" name="showdetails" type="button" onclick="showdetails()">Show Details
+    </button>
 
-    <ul title = "Cities" id = "citylist">
+    <ul title="Cities" id="citylist">
 
     </ul>
 
-    <form hidden class = "textboxes" id = "form">
-<label for="Name"> City:</label>
-<input type="text" id="Name" name="cityName" placeholder="">
-<label for="start">Start date:</label>
-<input type="date" id="start" name="startDate"
-       value="2022-12-01">
-<label for="start">Return date:</label>
-<input type="date" id="return" name="endDate"
-       value="2022-12-01">
-<label for="people">Persons:</label>
-<input type="number" id="people" name="nrofppl"
-       min="1" max="100" value="1"/>
-<label for="rooms">Rooms:</label>
-<input type="number" id="rooms" name="nrofrooms"
-       min="1" max="100"/>
-    <label for="transportation">Mode of transport:</label>
-    <select id="transportation" name="transportation">
-        <option value="Car">Car</option>
-        <option value="Bus">Bus</option>
-        <option value="Plane">Plane</option>
-        <option value="Bike">Bike</option>
-    </select>
+    <form hidden class="textboxes" id="form">
+        <label for="Name"> City:</label>
+        <input type="text" id="Name" name="cityName" placeholder="">
+        <label for="start">Start date:</label>
+        <input type="date" id="start" name="startDate"
+               value="2022-12-01">
+        <label for="start">Return date:</label>
+        <input type="date" id="return" name="endDate"
+               value="2022-12-01">
+        <label for="people">Persons:</label>
+        <input type="number" id="people" name="nrofppl"
+               min="1" max="100" value="1"/>
+        <label for="rooms">Rooms:</label>
+        <input type="number" id="rooms" name="nrofrooms"
+               min="1" max="100"/>
+        <label for="transportation">Mode of transport:</label>
+        <select id="transportation" name="transportation">
+            <option value="Car">Car</option>
+            <option value="Bus">Bus</option>
+            <option value="Plane">Plane</option>
+            <option value="Bike">Bike</option>
+        </select>
         <label for="objectivename">Objective name:</label><br>
         <input type="text" id="objectivename" name="objectivename"><br>
-        <button type = "button" id = "addobjective" onclick="addobjective1()">Add objective</button>
-    <form>
-  <button type = "button" id = "savebutton" onclick="toggleTable()">Search hotel</button>
-        <label for="hotelname">Hotel name:</label><br>
-        <input type="text" id="hotelname" name="hotelname"><br>
-        <button id = "search" type = "button" onclick="route()">Go</button>
-        <button id = "update" type = "button" hidden onclick="updatecity()">Update</button>
- </form>
+        <button type="button" id="addobjective" onclick="addobjective1()">Add objective</button>
+        <form>
+            <button type="button" id="savebutton" onclick="toggleTable()">Search hotel</button>
+            <label for="hotelname">Hotel name:</label><br>
+            <input type="text" id="hotelname" name="hotelname"><br>
+            <button id="search" type="button" onclick="route()">Go</button>
+            <button id="update" type="button" hidden onclick="updatecity()">Update</button>
+        </form>
 
         <ul id="myList" style="list-style-type:none;"></ul>
-</form>
+    </form>
 </div>
 <div id='map' class='map'></div>
 <div class="one"></div>
@@ -669,6 +674,7 @@ document.getElementById("hotelname").value = listdataarray[i+5];
 }
 }
   // ------------------------------------------------------------------------------------------------
+
   // ----------------------------------- updatecity.js ----------------------------------------------
 function updatecity(){
     document.getElementById("citylist").innerHTML = "";
@@ -978,7 +984,8 @@ detailscounter++;
                   map.removeSource('selectedPoi');
               }
           }
-    // ------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------
+
 
 </script>
 </body>

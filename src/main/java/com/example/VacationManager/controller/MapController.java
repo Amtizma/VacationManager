@@ -5,13 +5,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
 public class MapController {
     Hotels hotels = new Hotels();
     Locations locations = new Locations();
+    List<Location> cities = new ArrayList<>();
+
     public static class Location {
         private final double[] lnglat;
         private final String description;
@@ -29,25 +35,32 @@ public class MapController {
             return description;
         }
 
+        @Override
+        public String toString() {
+            return "Location{" +
+                    "lnglat=" + Arrays.toString(lnglat) +
+                    ", description='" + description + '\'' +
+                    '}';
+        }
+    }
+    public void ReadFile(){
+        try(BufferedReader br = new BufferedReader(new FileReader("orase.csv"))){
+            String line = br.readLine();
+            line = br.readLine();
+            String[] lineSplit;
+            while(line != null){
+                lineSplit = line.split(",");
+                cities.add(new Location(new double[]{Double.parseDouble(lineSplit[1]), Double.parseDouble(lineSplit[2])}, lineSplit[0]));
+                line = br.readLine();
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
     public List<Location> coolLocations() {
-        return List.of(
-                new Location(new double[]{2.349014, 48.864716}, "Paris"),
-                new Location(new double[]{2.173504, 41.403706}, "Barcelona"),
-                new Location(new double[]{-0.118092, 51.509865}, "London"),
-                new Location(new double[]{13.404954, 52.520008}, "Berlin"),
-                new Location(new double[]{12.496366, 41.902782}, "Rome"),
-                new Location(new double[]{16.363449, 48.210033}, "Vienna"),
-                new Location(new double[]{21.017532, 52.237049}, "Warsaw"),
-                new Location(new double[]{37.395744, 55.644466}, "Moscow"),
-                new Location(new double[]{26.096306, 44.439663}, "Bucharest"),
-                new Location(new double[]{19.040236, 47.497913}, "Budapest"),
-                new Location(new double[]{4.351721, 50.85034}, "Brussels"),
-                new Location(new double[]{14.418540, 50.073658}, "Prague"),
-                new Location(new double[]{12.568337, 55.676098}, "Copenhagen"),
-                new Location(new double[]{-73.935242, 40.730610}, "New York")
-        );
-    }
+        return cities;
+    };
     @Value("${tomtom.apikey}")
     private String tomTomApiKey;
 
@@ -58,6 +71,7 @@ public class MapController {
                                    @RequestParam(value = "nrofppl", required = false) String nrofppl,
                                    @RequestParam(value = "nrofrooms", required = false) String nrofrooms,
                                    Model model) throws IOException, InterruptedException {
+        ReadFile();
         model.addAttribute("apikey", tomTomApiKey);
         model.addAttribute("coolLocations", coolLocations());
         double[] lnglat = new double[2];
