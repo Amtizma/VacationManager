@@ -1,4 +1,6 @@
 function togglemap(){
+document.getElementById('start').valueAsDate = new Date();
+document.getElementById('return').valueAsDate = new Date();
 document.getElementById("startform").style.display="none";
 document.getElementById("mySidepanel").style.display="none";
 document.getElementById("mySidepanelCity").style.display="block";

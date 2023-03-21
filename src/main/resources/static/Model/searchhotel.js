@@ -1,7 +1,7 @@
-// Salveaza datele despre hoteluri din API si le afiseaza
-
 const hotelscoordinates = [];
  function toggleTable(){
+ if(!document.getElementById("people").value.startsWith("0") && !document.getElementById("rooms").value.startsWith("0") &&
+ document.getElementById("people").value !== "" && document.getElementById("rooms").value !== "" && document.getElementById("start").value<document.getElementById("returnDate").value){
  document.getElementById("myList").innerHTML = "";
   document.getElementById("myList").style.display="block";
   document.getElementById('citylist').style.display="none";
@@ -38,7 +38,6 @@ document.getElementById('myList').innerHTML += '<li id = "hname">' + hotelsarray
 document.getElementById('myList').innerHTML += '<li id = "himage"><img src=' + hotelsarray[i+5] + 'width="460" height="400"'+ '</li>';
 };
 }
-}
 const options = {
 	method: 'GET',
 	headers: {
@@ -50,10 +49,15 @@ var destinationcity2 = document.getElementById('Name1').value;
 var coordinates22index =locationsarray.indexOf(destinationcity2)+1;
 coordinates22 = locationsarray[coordinates22index];
 var adults_number = document.getElementById('people').value;
-var checkout_date = document.getElementById('return').value;
+var checkout_date = document.getElementById('returnDate').value;
 var checkin_date = document.getElementById('start').value;
 var room_number = document.getElementById('rooms').value;
 fetch('https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?longitude='+coordinates22[0]+'&locale=en-gb&adults_number=' + adults_number +'&filter_by_currency=EUR&checkout_date=' + checkout_date + '&units=metric&latitude=' + coordinates22[1] +'&order_by=popularity&room_number=' + room_number + '&checkin_date=' + checkin_date +'&include_adjacency=true', options)
 	.then(response => response.json())
 	.then(data => savehotels(data))
 	.catch(err => console.error(err));
+	}
+	else {
+	alert("Label error!");
+	}
+	}
