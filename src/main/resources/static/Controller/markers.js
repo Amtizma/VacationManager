@@ -8,7 +8,7 @@ function createMarkerElement(type) {
             return element;
         }
 
-        function addMarkers(feature) {
+       function addMarkers(feature) {
             var startPoint, endPoint;
             if (feature.geometry.type === 'MultiLineString') {
                 startPoint = feature.geometry.coordinates[0][0]; //get first point from first line

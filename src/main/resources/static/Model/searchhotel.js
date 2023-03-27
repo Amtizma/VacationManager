@@ -1,7 +1,8 @@
 const hotelscoordinates = [];
  function toggleTable(){
- if(!document.getElementById("people").value.startsWith("0") && !document.getElementById("rooms").value.startsWith("0") &&
- document.getElementById("people").value !== "" && document.getElementById("rooms").value !== "" && document.getElementById("start").value<document.getElementById("returnDate").value){
+ if(!document.getElementById("rooms").value.startsWith("0")  && document.getElementById("rooms").value !== ""){
+  if(document.getElementById("start").value<document.getElementById("returnDate").value){
+    if(!document.getElementById("people").value.startsWith("0") && document.getElementById("people").value !== ""){
  document.getElementById("myList").innerHTML = "";
   document.getElementById("myList").style.display="block";
   document.getElementById('citylist').style.display="none";
@@ -58,6 +59,14 @@ fetch('https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?longit
 	.catch(err => console.error(err));
 	}
 	else {
-	alert("Label error!");
+        	alert("Incorrect value for people label!");
+        	}
+	}
+	else {
+    	alert("The return date must be after start date!");
+    	}
+	}
+	else {
+	alert("Incorrect value for rooms label!");
 	}
 	}
