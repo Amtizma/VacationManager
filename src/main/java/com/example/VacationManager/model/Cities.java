@@ -7,13 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Cities {
-    List<Cities> cities = new ArrayList<>();
     private double[] lnglat;
-    private String description;
+    private String name;
 
-    public Cities(double[] lnglat, String description) {
+    public Cities(double[] lnglat, String name) {
         this.lnglat = lnglat;
-        this.description = description;
+        this.name = name;
     }
 
     public Cities() {
@@ -25,19 +24,20 @@ public class Cities {
         return lnglat;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
     @Override
     public String toString() {
         return "Location{" +
                 "lnglat=" + Arrays.toString(lnglat) +
-                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 
-    public void ReadFile() {
+    public List<Cities> ReadFile() {
+        List<Cities> cities = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader("orase.csv"))) {
             String line = br.readLine();
             line = br.readLine();
@@ -50,8 +50,6 @@ public class Cities {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    public List<Cities> coolLocations() {
         return cities;
-    };
+    }
 }

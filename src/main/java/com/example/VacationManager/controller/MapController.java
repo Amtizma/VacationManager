@@ -29,7 +29,7 @@ public class MapController {
                                    Model model) throws IOException, InterruptedException {
         cities.ReadFile();
         model.addAttribute("apikey", tomTomApiKey);
-        model.addAttribute("coolLocations", cities.coolLocations());
+        model.addAttribute("coolLocations", cities.ReadFile());
        return "home";
     }
 
