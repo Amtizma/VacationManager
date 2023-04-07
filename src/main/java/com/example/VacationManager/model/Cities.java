@@ -7,11 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Cities {
-    private double[] lnglat;
+    private double lng;
+    private double lat;
     private String name;
 
-    public Cities(double[] lnglat, String name) {
-        this.lnglat = lnglat;
+    public Cities(double lng, double lat, String name) {
+        this.lng = lng;
+        this.lat = lat;
         this.name = name;
     }
 
@@ -20,21 +22,17 @@ public class Cities {
     }
 
 
-    public double[] getLnglat() {
-        return lnglat;
+    public double getLng() {
+        return lng;
+    }
+    public double getLat() {
+        return lat;
     }
 
     public String getName() {
         return name;
     }
 
-    @Override
-    public String toString() {
-        return "Location{" +
-                "lnglat=" + Arrays.toString(lnglat) +
-                ", name='" + name + '\'' +
-                '}';
-    }
 
     public List<Cities> ReadFile() {
         List<Cities> cities = new ArrayList<>();
@@ -44,7 +42,7 @@ public class Cities {
             String[] lineSplit;
             while (line != null) {
                 lineSplit = line.split(",");
-                cities.add(new Cities(new double[]{Double.parseDouble(lineSplit[1]), Double.parseDouble(lineSplit[2])}, lineSplit[0]));
+                cities.add(new Cities(Double.parseDouble(lineSplit[1]), Double.parseDouble(lineSplit[2]), lineSplit[0]));
                 line = br.readLine();
             }
         } catch (Exception e) {
