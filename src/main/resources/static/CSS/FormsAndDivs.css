@@ -1,0 +1,160 @@
+.textboxes {
+    padding-top: 200px;
+    font-size: 20px;
+    text-align: center;
+}
+.header {
+    background-color: #f5f5dc;
+    font-size: 12px;
+    text-align: center;
+}
+#startdiv {
+    background-image: url('wallpaper.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    position: relative;
+    z-index: 1;
+
+}
+#startdiv::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    transform: translateX(-50%);
+    background-image: url('wallpaper.jpg');
+    background-size: cover;
+    background-repeat: repeat-y;
+    background-position: center center;
+    filter: blur(10px);
+    z-index: -1;
+}
+#citynamesform {
+    margin-left: 40%;
+    margin-top: 15px;
+    width: 150px;
+    position: fixed;
+    text-align: center;
+}
+#citynamesform label {
+    font-size: 20px;
+}
+#form {
+    margin-bottom: 100px;
+    z-index: 1;
+    top: 0;
+    padding-left: 20px;
+    flex-direction: column;
+    position: absolute;
+    text-align: center;
+}
+.sidepanelcity {
+    display:none;
+    position: relative;
+    width: 350px;
+    height: 60px;
+    background-color: white;
+    -moz-border-radius: 100px / 5px;
+    -webkit-border-radius: 100px / 5px;
+    border-radius: 20px;
+}
+.sidepanel {
+    height: 480px;
+    width: 350px;
+    display: none;
+    position: relative;
+    background-color: white;
+    top: -10px;
+    -moz-border-radius: 100px / 5px;
+    -webkit-border-radius: 100px / 5px;
+    border-radius: 20px;
+}
+#hotelData{
+    position: relative;
+    top: 20px;
+    /*background-image: url("background.jpg");
+    background-size: cover;*/
+}
+#objectives {
+    display: none;
+    position: relative;
+    top: 20px;
+}
+#listData {
+    top: 5px;
+    display: none;
+    height: 370px;
+    width: 350px;
+    position: relative;
+    background-color: white;
+    -moz-border-radius: 100px / 5px;
+    -webkit-border-radius: 100px / 5px;
+    border-radius: 20px;
+    box-sizing: border-box; /* Include padding and border in element dimensions */
+    padding: 10px; /* Add padding to avoid margin collapsing */
+}
+#detailslistid{
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    height: 330px;
+    min-height: 330px;
+    overflow-y: scroll;
+}
+#preview {
+    display: none;
+    position: relative;
+    top: 20px;
+}
+#popuphotels {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+#objectivelistdiv{
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    height: 200px;
+    min-height: 200px;
+    overflow-y: scroll;
+}
+#previewlistdiv{
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    height: 300px;
+    min-height: 300px;
+    overflow-y: scroll;
+}
+.blurred {
+    position: relative; /* Make sure the overlay is positioned relative to this element */
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+}
+.blurred::before {
+    content: ""; /* Create an empty pseudo-element */
+    position: absolute; /* Position it on top of the element */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease-out;
+}
+.blurred:hover::before {
+    opacity: 1; /* Show the overlay on hover and make it fully opaque */
+}

@@ -190,6 +190,10 @@
             button.addEventListener('click', () => {
                 const name = button.previousSibling.textContent.trim();
                 button.parentNode.remove();
+                const index = objectivelist.indexOf(name);
+                if (index > -1) {
+                    objectivelist.splice(index, 1);
+                }
             });
         });
     }
@@ -197,19 +201,12 @@
     //--------------------------------------------------------------------------------------------------
 
     // ----------------------------------- mapinitialization.js ----------------------------------------
-    const coolLocations = /*[[${coolLocations}]]*/ null;
-    coolLocations.forEach(location => {
-        const marker = new tt.Marker().setLngLat([location.lng,location.lat]).addTo(map);
-        const popup = new tt.Popup({offset: popupOffsets}).setHTML(location.name);
-        marker.setPopup(popup).togglePopup();
-        locationsarray.push(location.name, [location.lng, location.lat]);
-        const hotelsList = /*[[${hotelList}]]*/ null;
-        marker.getElement().addEventListener('click', function () {
-            const city1 = location.name;
-            document.getElementById('Name1').value = city1;
 
-        });
+    const coolLocations = /*[[${coolLocations}]]*/ null;
+   coolLocations.forEach(location => {
+       locationsarray.push(location.name, [location.lng, location.lat]);
     });
+
     map.addControl(new tt.FullscreenControl());
     map.addControl(new tt.NavigationControl());
     // ------------------------------------------------------------------------------------------------
@@ -224,6 +221,147 @@
     }
 
     // ------------------------------------------------------------------------------------------------
+
+    // ------------------------------------ Clustering ------------------------------------------------
+    var markersOnTheMap = {};
+    var eventListenersAdded = false;
+
+    var geoJson = {
+        type: 'FeatureCollection',
+        features: coolLocations.map(function(location) {
+            var feature = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [location.lng, location.lat]
+                },
+                properties: {
+                    id: location.name,
+                    name: location.name
+                }
+            };
+            return feature;
+        })
+    };
+
+    function refreshMarkers() {
+        Object.keys(markersOnTheMap).forEach(function(name) {
+            markersOnTheMap[name].remove();
+            delete markersOnTheMap[name];
+        });
+        map.querySourceFeatures('point-source').forEach(function(feature) {
+            if (feature.properties && !feature.properties.cluster) {
+                var name = feature.properties.name;
+                if (!markersOnTheMap[name]) {
+                    var newMarker = new tt.Marker().setLngLat(feature.geometry.coordinates);
+                    newMarker.addTo(map);
+                    const popup = new tt.Popup({offset: popupOffsets}).setHTML(feature.properties.name);
+                    newMarker.getElement().addEventListener('click', function () {
+                        newMarker.setPopup(popup).togglePopup();
+                        const city1 = feature.properties.name;
+                        document.getElementById('Name1').value = city1;
+                    });
+                    markersOnTheMap[name] = newMarker;
+
+                }
+            }
+        });
+    }
+
+    map.on('load', function() {
+        map.addSource('point-source', {
+            type: 'geojson',
+            data: geoJson,
+            cluster: true,
+            clusterMaxZoom: 14,
+            clusterRadius: 50
+        });
+
+        map.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            source: 'point-source',
+            filter: ['has', 'point_count'],
+            paint: {
+                'circle-color': [
+                    'step',
+                    ['get', 'point_count'],
+                    '#EC619F',
+                    4,
+                    '#008D8D',
+                    7,
+                    '#004B7F'
+                ],
+                'circle-radius': [
+                    'step',
+                    ['get', 'point_count'],
+                    15,
+                    4,
+                    20,
+                    7,
+                    25
+                ],
+                'circle-stroke-width': 1,
+                'circle-stroke-color': 'white',
+                'circle-stroke-opacity': 1
+            }
+        });
+
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'point-source',
+            filter: ['has', 'point_count'],
+            layout: {
+                'text-field': '{point_count_abbreviated}',
+                'text-size': 16
+            },
+            paint: {
+                'text-color': 'white'
+            }
+        });
+
+        map.on('data', function(e) {
+            if (e.sourceId !== 'point-source' || !map.getSource('point-source').loaded()) {
+                return;
+            }
+            refreshMarkers();
+            if (!eventListenersAdded) {
+                map.on('move', refreshMarkers);
+                map.on('moveend', refreshMarkers);
+                eventListenersAdded = true;
+            }
+        });
+
+        map.on('click', 'clusters', function(e) {
+            var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+            var clusterId = features[0].properties.cluster_id;
+            map.getSource('point-source').getClusterExpansionZoom(clusterId, function(err, zoom) {
+                if (err) {
+                    return;
+                }
+                map.easeTo({
+                    center: features[0].geometry.coordinates,
+                    zoom: zoom + 0.5
+                });
+                var currentZoom = map.getZoom();
+                if (currentZoom <= 14) {
+                    map.setLayoutProperty('unclustered-point-layer', 'visibility', 'none');
+                } else {
+                    map.setLayoutProperty('unclustered-point-layer', 'visibility', 'visible');
+                }
+            });
+        });
+        map.on('mouseenter', 'clusters', function() {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'clusters', function() {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+
+    // ------------------------------------------------------------------------------------------------
+
 
     // ----------------------------------- markers.js -------------------------------------------------
     function createMarkerElement(type) {
@@ -378,7 +516,7 @@
         tt.services.calculateRoute({
             key: [[${apikey}]],
             traffic: false,
-            locations: coordinates[0]+ ',' + coordinates[1] + ':' + coordinates2[0] + ',' + coordinates2[1]
+            locations: coordinates[0]+ ',' + coordinates[1] + ':' + hotelcd[0].replace(/\s/g, '') + ',' + hotelcd[1].replace(/\s/g, '')
         })
             .then(function(response) {
                 var geojson = response.toGeoJson();
@@ -413,6 +551,7 @@
                 infoHint.setMessage('Hover over the route to display a popup with route information');
             });
         routeid++;
+
     }
     // ------------------------------------------------------------------------------------------------
     // ----------------------------------- Buton done -------------------------------------------------
@@ -423,7 +562,7 @@
         document.getElementById("previewlist").innerHTML += '<li class = "previewcityname">' + document.getElementById("Name1").value + '</li>';
         document.getElementById("previewlist").innerHTML += '<li class = "previewhotelname">' + hotelname + '</li>';
         document.getElementById("previewlist").innerHTML += '<li class = "previewdate">' + document.getElementById("start").value + " to " + document.getElementById("returnDate").value + '</li>';
-        document.getElementById("previewlist").innerHTML += '<li class = "previewpeopleandrooms">'+ document.getElementById("people").value + " people ⚫ "+document.getElementById("rooms").value + " room(s) " + '</li>';
+        document.getElementById("previewlist").innerHTML += '<li class = "previewpeopleandrooms">'+ document.getElementById("people").value + " people <img id = \"roomsnumber\" src=\"https://cdn-icons-png.flaticon.com/512/1422/1422872.png\"> "+document.getElementById("rooms").value + " room(s) " + '</li>';
         document.getElementById("previewlist").innerHTML += '<li class = "previewtransportation">' + document.getElementById("transportation").value + '</li>';
         const sourceList = document.getElementById("objectivelistid");
         const targetList = document.getElementById("previewlist");
@@ -485,14 +624,14 @@
     const listdataarray = [];
     listdataarray[0] = document.getElementById('startingcityname').value;
     var position = 1;
-
+    var hotelcd = [];
     function route() {
         document.getElementById("mySidepanel").style.display = "none";
         document.getElementById("listData").style.display = "block";
         document.getElementById("detailslist").innerHTML += '<li class="detailscityname">' + document.getElementById("Name1").value + '<button class="hideButton" onclick = "hideElements(this)" ></button><button class="showButton" onclick = "showElements(this)"></button></li>';
         document.getElementById("detailslist").innerHTML += '<li class = "detailshotel">' + hotelname + '</li>';
         document.getElementById("detailslist").innerHTML += '<li class = "detailsdate">' + document.getElementById("start").value + " to " + document.getElementById("returnDate").value + '</li>';
-        document.getElementById("detailslist").innerHTML += '<li class = "detailspeopleandrooms">'+ document.getElementById("people").value + " people ⚫ "+document.getElementById("rooms").value + " room(s) " + '</li>';
+        document.getElementById("detailslist").innerHTML += '<li class = "detailspeopleandrooms">'+ document.getElementById("people").value + " people <img id = \"roomsnumberdetails\" src=\"https://cdn-icons-png.flaticon.com/512/1422/1422872.png\"> "+document.getElementById("rooms").value + " room(s) " + '</li>';
         document.getElementById("detailslist").innerHTML += '<li class = "detailstransportation">' + document.getElementById("transportation").value + '</li>';
         const sourceList = document.getElementById("objectivelistid");
         const targetList = document.getElementById("detailslist");
@@ -509,7 +648,7 @@
         coordinates2 = locationsarray[coordinates2index];
         for (let i = 0; i < hotelscoordinates.length; i = i + 3) {
             if (hotelscoordinates[i] === hotelname) {
-                var hotelcd = [];
+                hotelcd = [];
                 hotelcd[1] = hotelscoordinates[i + 1];
                 hotelcd[0] = hotelscoordinates[i + 2];
                 createMarkerHotel(hotelcd, '#FF0000', hotelscoordinates[i]);
@@ -678,10 +817,14 @@
                             if (values[i] == "max_1440_photo_url") hotelscoordinates.push(hotel_name, latitude, longitude);
                         }
                         for (let i = 0; i < hotelsarray.length; i = i + 6) {
-                            document.getElementById('myList').innerHTML += '<li id = "hname" onclick="gethotel(this)">' + hotelsarray[i + 1] + '</li>';
-                            document.getElementById('myList').innerHTML += '<li id = "hlink" ><a href="' + hotelsarray[i] + '"/>' + "Link" + '</a>' + '</li>';
-                            document.getElementById('myList').innerHTML += '<li id = "hmoney">' + hotelsarray[i + 4] + "€" + '</li>';
-                            document.getElementById('myList').innerHTML += '<li id = "himage"><img src=' + hotelsarray[i + 5] + 'width="460" height="400"' + '</li>';
+                            let hotelDiv = '<a href="' + hotelsarray[i] + '" target="_blank" rel="noopener noreferrer">';
+                            hotelDiv += '<div class="blurred">';
+                            hotelDiv += '<li id="hname">' + hotelsarray[i + 1] + '</li>';
+                            hotelDiv += '<li id="hmoney">' + hotelsarray[i + 4] + "€" + '</li>';
+                            hotelDiv += '<li id="himage"><img src="' + hotelsarray[i + 5] + '" width="460" height="400"></li>';
+                            hotelDiv += '</div>';
+                            document.getElementById('myList').innerHTML += hotelDiv;
+                            document.getElementById('myList').innerHTML  += '<li><button id="hbutton" onclick="gethotel(\'' + hotelsarray[i + 1] + '\')">Select</button></li>';
                         }
                     }
 
@@ -716,6 +859,8 @@
 
     // ------------------------------------------------------------------------------------------------
 
+
+
     // ----------------------------------- misc.js ----------------------------------------------------
     function isMobileOrTablet() {
         var i, a = !1;
@@ -728,13 +873,14 @@
     // ----------------------------------- gethotel.js ------------------------------------------------
     let hotelname;
     function gethotel(e) {
-        hotelname = e.textContent;
+        hotelname = e;
         document.getElementById('popuphotels').style.display = "none";
         document.getElementById('hotelData').style.display = "none";
         document.getElementById('objectives').style.display = "block";
         document.getElementById("mySidepanel").style.filter = "none";
         document.getElementById("mySidepanelCity").style.filter = "none";
         document.getElementById("map").style.filter = "none";
+        document.getElementById("myList").innerHTML = "";
     }
 
     // ------------------------------------------------------------------------------------------------

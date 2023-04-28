@@ -1,0 +1,324 @@
+#hname {
+    text-align: center;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    border-top: 2px solid white;
+    color: white;
+
+}
+#hname:hover{
+   background-color: #43B0F1;
+   cursor: pointer;
+   }
+#hlink{
+    text-align: center;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    color: #0077cc;
+}
+#hmoney {
+    text-align: center;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    color: white;
+}
+#himage {
+    vertical-align: middle;
+    text-align: center;
+    margin-bottom: 50px;
+}
+#listelement {
+    border: solid 3px DodgerBlue;
+    border-radius: 10px;
+    margin: 15px 0;
+    margin-right: 50px;
+    text-align: center;
+    list-style-type: none;
+}
+.listdetails {
+    font-size: 12px;
+    list-style-type: none;
+    margin-right: 50px;
+    text-align: center;
+    display: none;
+}
+#citylist {
+    margin-top: 60px;
+    margin-right: 50px;
+    display: none;
+    margin-left: 285px;
+    font-size: 24px;
+}
+ul[title]::before {
+    content: attr(title);
+    display: block;
+    font-weight: bold;
+    margin-right: 50px;
+    padding: 4px;
+    text-align: center;
+    font-size: 30px;
+}
+#myList {
+    width: 30%;
+    margin: 0 auto;
+    padding: 0;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+#objectivelistid{
+    list-style-type: none;
+}
+#objectivelistelement:before{
+    content: '\01F3EF';
+    font-size:24px;
+    margin-right:6px;
+}
+#objectivelistelement{
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+#previewlist{
+    list-style-type: none;
+}
+.previewcityname{
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    margin-top:10px;
+}
+.previewcityname::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2942/2942076.png');
+    background-size: cover;
+}
+.previewhotelname{
+    margin-top:10px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+.previewhotelname::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/3009/3009710.png');
+    background-size: cover;
+}
+.previewdate{
+    margin-top:10px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+.previewdate::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2370/2370264.png');
+    background-size: cover;
+}
+.previewpeopleandrooms{
+    margin-top:10px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+.previewpeopleandrooms::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/711/711168.png');
+    background-size: cover;
+}
+#roomsnumber{
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/1422/1422872.png');
+    background-size: cover;
+
+}
+.previewtransportation{
+    margin-top:10px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+.previewtransportation::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/995/995334.png');
+    background-size: cover;
+}
+.previewobjectives{
+    margin-top:10px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+}
+.previewobjectives::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/9294/9294301.png');
+    background-size: cover;
+}
+#detailslist{
+    list-style-type: none;
+}
+
+.detailsstartingcity{
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    margin-top:10px;
+}
+.detailsstartingcity::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2942/2942076.png');
+    background-size: cover;
+}
+.detailscityname{
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 30px;
+    margin-top:10px;
+}
+.detailscityname::before {
+    margin-top:10px;
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2942/2942076.png');
+    background-size: cover;
+}
+.detailshotel{
+    display: none;
+    margin-top:3px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+}
+.detailshotel::before {
+    margin-top:3px;
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/3009/3009710.png');
+    background-size: cover;
+}
+.detailsdate{
+    display: none;
+    margin-top:3px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+}
+.detailsdate::before {
+    margin-top:3px;
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2370/2370264.png');
+    background-size: cover;
+}
+.detailspeopleandrooms{
+    display: none;
+    margin-top:3px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+}
+.detailspeopleandrooms::before {
+    margin-top:3px;
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/711/711168.png');
+    background-size: cover;
+}
+#roomsnumberdetails{
+    margin-top:3px;
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/1422/1422872.png');
+    background-size: cover;
+
+}
+.detailstransportation{
+    display: none;
+    margin-top:3px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+}
+.detailstransportation::before {
+    margin-top:3px;
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/995/995334.png');
+    background-size: cover;
+}
+.detailsobjectives{
+    display: none;
+    margin-top:3px;
+    vertical-align: middle;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 20px;
+}
+.detailsobjectives::before {
+    margin-top:3px;
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/9294/9294301.png');
+    background-size: cover;
+}
+

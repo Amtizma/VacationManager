@@ -1,0 +1,257 @@
+#startmap {
+    display: block;
+    flex-direction:column;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    background-color: #73d5ff;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/44/44536.png");
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 170px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+    position: relative;
+    z-index: 2;
+
+}
+#startmap:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+#savebutton {
+    display: block;
+    margin: 0 auto;
+    flex-direction:column;
+    width: 200px;
+    height: 40px;
+    margin-top: 30px;
+    border: 2px solid purple;
+    background-color: #73d5ff;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/1668/1668915.png");
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 170px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+#savebutton:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#addobjective{
+    display: block;
+    margin: 0 auto;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/685/685655.png");
+    background-color:  #73d5ff;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 172px;
+    background-position-y: 11px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+#addobjective:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#donebutton{
+    display: block;
+    margin: 0 auto;
+    margin-top: 15px;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/447/447147.png");
+    background-color:  #73d5ff;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 172px;
+    background-position-y: 11px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+#donebutton:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+#confirm{
+    display: block;
+    margin: 0 auto;
+    margin-top: 15px;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/447/447147.png");
+    background-color:  #73d5ff;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 172px;
+    background-position-y: 11px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+#confirm:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#cancel{
+    display: block;
+    margin: 0 auto;
+    margin-top: 15px;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/1828/1828778.png");
+    background-color: #b81717;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 172px;
+    background-position-y: 11px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+#cancel:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+
+
+#search {
+    margin: auto;
+    display: block;
+}
+#addroute {
+    margin: auto;
+    display: block;
+}
+#menubutton {
+    margin-top: 20px;
+    position: absolute;
+    margin-left: 20px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background-color: transparent;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/7216/7216128.png');
+    background-size: cover;
+}
+#menubutton:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+#addtotrip {
+    position: absolute;
+    margin-top: 20px;
+    margin-left: 300px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background-color: transparent;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/49/49116.png');
+    background-size: cover;
+}
+#addtotrip:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.addtotrip {
+    margin-left: 100px;
+}
+.remove-button{
+     background-color: transparent;
+     background-image: url('https://cdn-icons-png.flaticon.com/512/2984/2984959.png');
+     background-size: cover;
+     margin-left: 10px;
+     width:24px;
+     height: 24px;
+     border: none;
+     cursor: pointer;
+     vertical-align: middle;
+}
+.remove-button:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.btn {
+    background-color: DodgerBlue; /* Blue background */
+    z-index: 1;
+    top: 0;
+    left: 0;
+    display: none;
+    position: absolute;
+    border: none; /* Remove borders */
+    color: white; /* White text */
+    padding: 12px 16px; /* Some padding */
+    font-size: 16px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+}
+.savetopdf {
+
+}
+.showdetails {
+
+}
+.hideButton{
+    display: none;
+    background-color: transparent;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/43/43625.png');
+    background-size: cover;
+    margin-left: 10px;
+    width:20px;
+    height: 20px;
+    border: none;
+    cursor: pointer;
+    vertical-align: middle;
+
+}
+.showButton{
+    background-color: transparent;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/748/748113.png');
+    background-size: cover;
+    margin-left: 10px;
+    width:20px;
+    height: 20px;
+    border: none;
+    cursor: pointer;
+    vertical-align: middle;
+    display: inline-block;
+    padding: 0;
+}
+#hbutton{
+    display: block;
+    flex-direction:column;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    border-radius: 20px;
+    background-image: url("https://cdn-icons-png.flaticon.com/512/447/447147.png");
+    background-color:  #73d5ff;
+    background-repeat: no-repeat;
+    background-position: right;
+    background-position-x: 172px;
+    background-position-y: 11px;
+    background-size: 20px 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+#hbutton:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
