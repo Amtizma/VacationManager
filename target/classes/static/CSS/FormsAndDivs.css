@@ -1,0 +1,229 @@
+.textboxes {
+    padding-top: 200px;
+    font-size: 20px;
+    text-align: center;
+}
+.header {
+    background-color: #f5f5dc;
+    font-size: 12px;
+    text-align: center;
+}
+#startdiv {
+    background-image: url('wallpaper.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    position: relative;
+    z-index: 1;
+
+}
+#startdiv::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    transform: translateX(-50%);
+    background-image: url('wallpaper.jpg');
+    background-size: cover;
+    background-repeat: repeat-y;
+    background-position: center center;
+    filter: blur(10px);
+    z-index: -1;
+}
+#citynamesform {
+    margin-left: 40%;
+    margin-top: 15px;
+    width: 150px;
+    position: fixed;
+    text-align: center;
+}
+#citynamesform label {
+    font-size: 20px;
+}
+#form {
+    margin-bottom: 100px;
+    z-index: 1;
+    top: 0;
+    padding-left: 20px;
+    flex-direction: column;
+    position: absolute;
+    text-align: center;
+}
+.sidepanelcity {
+    display:none;
+    position: relative;
+    width: 350px;
+    height: 60px;
+    background-color: white;
+    -moz-border-radius: 100px / 5px;
+    -webkit-border-radius: 100px / 5px;
+    border-radius: 20px;
+}
+.sidepanel {
+    height: 480px;
+    width: 350px;
+    display: none;
+    position: relative;
+    background-color: white;
+    top: -10px;
+    -moz-border-radius: 100px / 5px;
+    -webkit-border-radius: 100px / 5px;
+    border-radius: 20px;
+    opacity: 0;
+    animation: fadeInEffect 0.5s ease-in forwards;
+}
+#hotelData{
+    position: relative;
+    top: 20px;
+
+}
+#objectives {
+    display: none;
+    position: relative;
+    top: 20px;
+}
+#listData {
+    top: 5px;
+    display: none;
+    height: 370px;
+    width: 350px;
+    position: relative;
+    background-color: white;
+    -moz-border-radius: 100px / 5px;
+    -webkit-border-radius: 100px / 5px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    padding: 10px;
+    opacity: 0;
+    animation: fadeInEffect 0.5s ease-in forwards;
+}
+#detailslistid{
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    height: 330px;
+    min-height: 330px;
+    overflow-y: scroll;
+}
+#preview {
+    display: none;
+    position: relative;
+    top: 20px;
+    opacity: 0;
+    animation: fadeInEffect 0.5s ease-in forwards;
+}
+#popuphotels {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+#objectivelistdiv{
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    height: 200px;
+    min-height: 200px;
+    overflow-y: scroll;
+}
+#previewlistdiv{
+    position: relative;
+    margin-top: 15px;
+    margin-bottom: 30px;
+    height: 300px;
+    min-height: 300px;
+    overflow-y: scroll;
+}
+.blurred {
+    position: relative;
+}
+.blurred::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 20px);
+    background-color: black;
+    filter: blur(8px);
+    opacity:0;
+    z-index: -1;
+}
+.blurred:hover::before {
+    opacity: 1;
+}
+.alert {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 9999;
+}
+
+.alert-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 20px;
+    transform: translate(-50%,-50%);
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.alert-content h2 {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 32px;
+}
+
+.alert-content button {
+    margin-top: 15px;
+    width: 200px;
+    height: 40px;
+    border: 2px solid purple;
+    border-radius: 20px;
+    background-color:  #73d5ff;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+
+}
+#alert-message{
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+#sortmenu{
+    display: flex;
+    margin: 0 auto;
+    padding: 15px;
+    justify-content: center;
+}
+#sortOption{
+    width: 300px;
+    border-radius: 20px;
+    text-align: center;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 24px;
+}
+
+@keyframes fadeInEffect {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
