@@ -17,6 +17,7 @@
     <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/5.x/5.63.0/maps/maps-web.min.js'></script>
     <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.21.3/services/services-web.min.js'></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typeahead.js@0.11.1/dist/typeahead.bundle.min.js"></script>
     <script>
         (function () {
             window.SS = window.SS || {};
@@ -47,19 +48,35 @@
     </script>
 </head>
 <body>
+<div id="myAlert" class="alert">
+    <div class="alert-content">
+        <h2>Error</h2>
+        <p id="alert-message"></p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+</div>
+
 <div id="startdiv">
     <label id="welcome">Welcome to Vacation Manager!</label>
     <label id="startlabel" for="startingcityname">City name</label>
-    <input type="text" id="startingcityname" name="startingcityname" placeholder="Introduce your starting city">
+    <div class = "input-container1">
+    <input type="text" id="startingcityname" name="startingcityname" placeholder="Introduce your starting city" autocomplete="off">
+    <ul class="options1">
+    </ul>
+    </div>
     <button id="startmap" type="button" onclick="togglemap()">Start</button>
 </div>
 <div id='map' class='map'></div>
 <div id="mySidepanelCity" class="sidepanelcity">
-    <input type="text" id="Name1" name="Name1" placeholder="Enter your destination city">
+    <div class = "input-container">
+    <input type="text" id="Name1" name="Name1" placeholder="Enter your destination city" autocomplete="off">
+    <ul class="options">
+    </ul>
+    </div>
     <button id="addtotrip" title="Search" onclick="zoomcity()"></button>
     <button id="menubutton" title="Menu" onclick="menubutton()"></button>
 </div>
-<div id="mySidepanel" class="sidepanel">
+<div id="mySidepanel" class="sidepanel fade-in">
     <ul title="Cities" id="citylist">
     </ul>
     <div id="hotelData">
@@ -111,9 +128,26 @@
     </div>
 </div>
 <div id="popuphotels">
+    <div id = "sortmenu">
+        <select id="sortOption" onchange="sortHotels()">
+            <option value="" class = "sortoptions">Sort By</option>
+            <option value="nameAsc" class = "sortoptions">Name (Ascending)</option>
+            <option value="nameDesc" class = "sortoptions">Name (Descending)</option>
+            <option value="priceAsc" class = "sortoptions">Price (Ascending)</option>
+            <option value="priceDesc" class = "sortoptions" >Price (Descending)</option>
+        </select>
+    </div>
     <ul id="myList" style="list-style-type:none;"></ul>
 </div>
 <script th:inline="javascript">
+    function showAlert(errorText) {
+        document.getElementById("alert-message").innerHTML = errorText;
+        document.getElementById("myAlert").style.display = "block";
+    }
+
+    function closeAlert() {
+        document.getElementById("myAlert").style.display = "none";
+    }
     function resizeTextarea() {
         var textarea = document.getElementById("objectivename");
 
@@ -140,6 +174,7 @@
     var destinationcity;
     const locationsarray = [];
     const cityarray = [];
+    const cities = [];
     var map = tt.map({
         key: [[${apikey}]], // this will be replaced by Thymeleaf at runtime
         container: 'map',
@@ -176,7 +211,7 @@
             document.getElementById('objectivelistid').innerHTML += '<li id="objectivelistelement">' + newObjective + '<button class="remove-button" onclick = "removeObjective()"></button>' + '</li>';
             objectivenumber++;
         } else {
-            alert("Objective already added!");
+            showAlert("Objective already added!");
         }
     }
 
@@ -190,26 +225,23 @@
             button.addEventListener('click', () => {
                 const name = button.previousSibling.textContent.trim();
                 button.parentNode.remove();
+                const index = objectivelist.indexOf(name);
+                if (index > -1) {
+                    objectivelist.splice(index, 1);
+                }
             });
         });
     }
 
     //--------------------------------------------------------------------------------------------------
-
     // ----------------------------------- mapinitialization.js ----------------------------------------
-    const coolLocations = /*[[${coolLocations}]]*/ null;
-    coolLocations.forEach(location => {
-        const marker = new tt.Marker().setLngLat([location.lng,location.lat]).addTo(map);
-        const popup = new tt.Popup({offset: popupOffsets}).setHTML(location.name);
-        marker.setPopup(popup).togglePopup();
-        locationsarray.push(location.name, [location.lng, location.lat]);
-        const hotelsList = /*[[${hotelList}]]*/ null;
-        marker.getElement().addEventListener('click', function () {
-            const city1 = location.name;
-            document.getElementById('Name1').value = city1;
 
-        });
+    const coolLocations = /*[[${coolLocations}]]*/ null;
+   coolLocations.forEach(location => {
+       locationsarray.push(location.name, [location.lng, location.lat]);
+       cities.push(location.name);
     });
+
     map.addControl(new tt.FullscreenControl());
     map.addControl(new tt.NavigationControl());
     // ------------------------------------------------------------------------------------------------
@@ -224,6 +256,209 @@
     }
 
     // ------------------------------------------------------------------------------------------------
+
+    // ------------------------------------ Clustering ------------------------------------------------
+    var markersOnTheMap = {};
+    var eventListenersAdded = false;
+
+    var geoJson = {
+        type: 'FeatureCollection',
+        features: coolLocations.map(function(location) {
+            var feature = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [location.lng, location.lat]
+                },
+                properties: {
+                    id: location.name,
+                    name: location.name
+                }
+            };
+            return feature;
+        })
+    };
+
+    function refreshMarkers() {
+        Object.keys(markersOnTheMap).forEach(function(name) {
+            markersOnTheMap[name].remove();
+            delete markersOnTheMap[name];
+        });
+        map.querySourceFeatures('point-source').forEach(function(feature) {
+            if (feature.properties && !feature.properties.cluster) {
+                var name = feature.properties.name;
+                if (!markersOnTheMap[name]) {
+                    var newMarker = new tt.Marker().setLngLat(feature.geometry.coordinates);
+                    newMarker.addTo(map);
+                    const popup = new tt.Popup({offset: popupOffsets}).setHTML(feature.properties.name);
+                    newMarker.setPopup(popup);
+                    newMarker.getElement().addEventListener('mouseenter', function () {
+                        newMarker.togglePopup();
+                    });
+                    newMarker.getElement().addEventListener('mouseleave', function () {
+                        newMarker.togglePopup();
+                    });
+                    newMarker.getElement().addEventListener('click', function () {
+                        const city1 = feature.properties.name;
+                        document.getElementById('Name1').value = city1;
+                    });
+                    markersOnTheMap[name] = newMarker;
+
+                }
+            }
+        });
+    }
+
+    map.on('load', function() {
+        map.addSource('point-source', {
+            type: 'geojson',
+            data: geoJson,
+            cluster: true,
+            clusterMaxZoom: 14,
+            clusterRadius: 50
+        });
+
+        map.addLayer({
+            id: 'clusters',
+            type: 'circle',
+            source: 'point-source',
+            filter: ['has', 'point_count'],
+            paint: {
+                'circle-color': [
+                    'step',
+                    ['get', 'point_count'],
+                    '#EC619F',
+                    4,
+                    '#008D8D',
+                    7,
+                    '#004B7F'
+                ],
+                'circle-radius': [
+                    'step',
+                    ['get', 'point_count'],
+                    15,
+                    4,
+                    20,
+                    7,
+                    25
+                ],
+                'circle-stroke-width': 1,
+                'circle-stroke-color': 'white',
+                'circle-stroke-opacity': 1
+            }
+        });
+
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'point-source',
+            filter: ['has', 'point_count'],
+            layout: {
+                'text-field': '{point_count_abbreviated}',
+                'text-size': 16
+            },
+            paint: {
+                'text-color': 'white'
+            }
+        });
+
+        map.on('data', function(e) {
+            if (e.sourceId !== 'point-source' || !map.getSource('point-source').loaded()) {
+                return;
+            }
+            refreshMarkers();
+            if (!eventListenersAdded) {
+                map.on('move', refreshMarkers);
+                map.on('moveend', refreshMarkers);
+                eventListenersAdded = true;
+            }
+        });
+
+        map.on('click', 'clusters', function(e) {
+            var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+            var clusterId = features[0].properties.cluster_id;
+            map.getSource('point-source').getClusterExpansionZoom(clusterId, function(err, zoom) {
+                if (err) {
+                    return;
+                }
+                map.easeTo({
+                    center: features[0].geometry.coordinates,
+                    zoom: zoom + 0.5
+                });
+                var currentZoom = map.getZoom();
+                if (currentZoom <= 14) {
+                    map.setLayoutProperty('unclustered-point-layer', 'visibility', 'none');
+                } else {
+                    map.setLayoutProperty('unclustered-point-layer', 'visibility', 'visible');
+                }
+            });
+        });
+        map.on('mouseenter', 'clusters', function() {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'clusters', function() {
+            map.getCanvas().style.cursor = '';
+        });
+    });
+
+    // ------------------------------------------------------------------------------------------------
+    //------------------------------------ Autocomplete ------------------------------------------------
+    $(document).ready(function() {
+        const input = $('#Name1');
+        const options = $('.options');
+
+        input.on('input', function() {
+            const value = input.val();
+            options.empty();
+
+            cities.forEach(function(city) {
+                if (city.toLowerCase().startsWith(value.toLowerCase())) {
+                    options.append(`<li>${city}</li>`);
+                }
+            });
+        });
+
+        options.on('click', 'li', function() {
+            const value = $(this).text();
+            input.val(value);
+            options.empty();
+        });
+
+        input.on('blur', function() {
+            setTimeout(function() {
+                options.empty();
+            }, 100);
+        });
+    });
+    $(document).ready(function() {
+        const input = $('#startingcityname');
+        const options = $('.options1');
+
+        input.on('input', function() {
+            const value = input.val();
+            options.empty();
+
+            cities.forEach(function(city) {
+                if (city.toLowerCase().startsWith(value.toLowerCase())) {
+                    options.append(`<li>${city}</li>`);
+                }
+            });
+        });
+
+        options.on('click', 'li', function() {
+            const value = $(this).text();
+            input.val(value);
+            options.empty();
+        });
+
+        input.on('blur', function() {
+            setTimeout(function() {
+                options.empty();
+            }, 100);
+        });
+    });
+    //--------------------------------------------------------------------------------------------------
+
 
     // ----------------------------------- markers.js -------------------------------------------------
     function createMarkerElement(type) {
@@ -278,6 +513,12 @@
             const objective = popupText;
             document.getElementById('objectivename').value = objective;
             resizeTextarea();
+        });
+        marker.getElement().addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+            const popupObjectiveName = popupText;
+            const googleSearchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(popupObjectiveName + ", " + document.getElementById('Name1').value);
+            window.open(googleSearchUrl, '_blank');
         });
     }
 
@@ -378,7 +619,7 @@
         tt.services.calculateRoute({
             key: [[${apikey}]],
             traffic: false,
-            locations: coordinates[0]+ ',' + coordinates[1] + ':' + coordinates2[0] + ',' + coordinates2[1]
+            locations: coordinates[0]+ ',' + coordinates[1] + ':' + hotelcd[0].replace(/\s/g, '') + ',' + hotelcd[1].replace(/\s/g, '')
         })
             .then(function(response) {
                 var geojson = response.toGeoJson();
@@ -413,6 +654,7 @@
                 infoHint.setMessage('Hover over the route to display a popup with route information');
             });
         routeid++;
+
     }
     // ------------------------------------------------------------------------------------------------
     // ----------------------------------- Buton done -------------------------------------------------
@@ -420,10 +662,13 @@
     function doneObjectives(){
         document.getElementById("objectives").style.display = "none";
         document.getElementById("preview").style.display = "block";
+        setTimeout(function() {
+            document.getElementById("preview").style.opacity = "1";
+        }, 10);
         document.getElementById("previewlist").innerHTML += '<li class = "previewcityname">' + document.getElementById("Name1").value + '</li>';
         document.getElementById("previewlist").innerHTML += '<li class = "previewhotelname">' + hotelname + '</li>';
         document.getElementById("previewlist").innerHTML += '<li class = "previewdate">' + document.getElementById("start").value + " to " + document.getElementById("returnDate").value + '</li>';
-        document.getElementById("previewlist").innerHTML += '<li class = "previewpeopleandrooms">'+ document.getElementById("people").value + " people ⚫ "+document.getElementById("rooms").value + " room(s) " + '</li>';
+        document.getElementById("previewlist").innerHTML += '<li class = "previewpeopleandrooms">'+ document.getElementById("people").value + " people <img id = \"roomsnumber\" src=\"https://cdn-icons-png.flaticon.com/512/1422/1422872.png\"> "+document.getElementById("rooms").value + " room(s) " + '</li>';
         document.getElementById("previewlist").innerHTML += '<li class = "previewtransportation">' + document.getElementById("transportation").value + '</li>';
         const sourceList = document.getElementById("objectivelistid");
         const targetList = document.getElementById("previewlist");
@@ -469,14 +714,18 @@
 
     function menubutton() {
         if (menucounter % 2 == 1) {
-            document.getElementById("mySidepanel").style.display = "block";
+            document.getElementById("listData").style.display = "block";
+            setTimeout(function() {
+                document.getElementById("listData").style.opacity = "1";
+            }, 10);
         }
         if (menucounter % 2 == 0) {
-            document.getElementById("mySidepanel").style.display = "none";
+            document.getElementById("listData").style.display = "none";
         }
         menucounter++;
 
     }
+
 
     // ------------------------------------------------------------------------------------------------
 
@@ -485,14 +734,17 @@
     const listdataarray = [];
     listdataarray[0] = document.getElementById('startingcityname').value;
     var position = 1;
-
+    var hotelcd = [];
     function route() {
         document.getElementById("mySidepanel").style.display = "none";
         document.getElementById("listData").style.display = "block";
-        document.getElementById("detailslist").innerHTML += '<li class="detailscityname">' + document.getElementById("Name1").value + '<button class="hideButton" onclick = "hideElements(this)" ></button><button class="showButton" onclick = "showElements(this)"></button></li>';
+        setTimeout(function() {
+            document.getElementById("listData").style.opacity = "1";
+        }, 10);
+        document.getElementById("detailslist").innerHTML += '<li class="detailscityname"><button class="hideButton" onclick="hideElements(this)"></button><button class="showButton" onclick="showElements(this)"></button><span class="cityImage"></span>' + document.getElementById("Name1").value + '</li>';
         document.getElementById("detailslist").innerHTML += '<li class = "detailshotel">' + hotelname + '</li>';
         document.getElementById("detailslist").innerHTML += '<li class = "detailsdate">' + document.getElementById("start").value + " to " + document.getElementById("returnDate").value + '</li>';
-        document.getElementById("detailslist").innerHTML += '<li class = "detailspeopleandrooms">'+ document.getElementById("people").value + " people ⚫ "+document.getElementById("rooms").value + " room(s) " + '</li>';
+        document.getElementById("detailslist").innerHTML += '<li class = "detailspeopleandrooms">'+ document.getElementById("people").value + " people <img id = \"roomsnumberdetails\" src=\"https://cdn-icons-png.flaticon.com/512/1422/1422872.png\"> "+document.getElementById("rooms").value + " room(s) " + '</li>';
         document.getElementById("detailslist").innerHTML += '<li class = "detailstransportation">' + document.getElementById("transportation").value + '</li>';
         const sourceList = document.getElementById("objectivelistid");
         const targetList = document.getElementById("detailslist");
@@ -509,7 +761,7 @@
         coordinates2 = locationsarray[coordinates2index];
         for (let i = 0; i < hotelscoordinates.length; i = i + 3) {
             if (hotelscoordinates[i] === hotelname) {
-                var hotelcd = [];
+                hotelcd = [];
                 hotelcd[1] = hotelscoordinates[i + 1];
                 hotelcd[0] = hotelscoordinates[i + 2];
                 createMarkerHotel(hotelcd, '#FF0000', hotelscoordinates[i]);
@@ -594,6 +846,9 @@
         objectivenumber = 0;
         cityarray.push(document.getElementById('Name1').value);
         document.getElementById("mySidepanel").style.display = "block";
+        setTimeout(function() {
+            document.getElementById("mySidepanel").style.opacity = "1";
+        }, 10);
         destinationcity = document.getElementById('Name1').value;
         const locationsarray2 = [];
 
@@ -641,11 +896,8 @@
 
     // ----------------------------------- searchhotel.js ----------------------------------------------
     const hotelscoordinates = [];
-
+    let hotelsarraycopy = [];
     function toggleTable() {
-        document.getElementById("hotelData").style.display = "none";
-        document.getElementById("objectives").style.display = "block";
-        addtrip();
         if (!document.getElementById("rooms").value.startsWith("0") && document.getElementById("rooms").value !== "") {
             if (document.getElementById("start").value < document.getElementById("returnDate").value) {
                 if (!document.getElementById("people").value.startsWith("0") && document.getElementById("people").value !== "") {
@@ -655,6 +907,7 @@
                     document.getElementById("mySidepanelCity").style.filter = "blur(3px)";
                     document.getElementById("map").style.filter = "blur(3px)";
                     const hotelsarray = [];
+                    hotelsarraycopy = [];
 
                     function savehotels(response) {
                         const apiresponse = response;
@@ -678,10 +931,22 @@
                             if (values[i] == "max_1440_photo_url") hotelscoordinates.push(hotel_name, latitude, longitude);
                         }
                         for (let i = 0; i < hotelsarray.length; i = i + 6) {
-                            document.getElementById('myList').innerHTML += '<li id = "hname" onclick="gethotel(this)">' + hotelsarray[i + 1] + '</li>';
-                            document.getElementById('myList').innerHTML += '<li id = "hlink" ><a href="' + hotelsarray[i] + '"/>' + "Link" + '</a>' + '</li>';
-                            document.getElementById('myList').innerHTML += '<li id = "hmoney">' + hotelsarray[i + 4] + "€" + '</li>';
-                            document.getElementById('myList').innerHTML += '<li id = "himage"><img src=' + hotelsarray[i + 5] + 'width="460" height="400"' + '</li>';
+                            let hotelDiv = '';
+                            hotelDiv += '<div class="blurred">';
+                            hotelDiv += '<li id="hname">' + hotelsarray[i + 1] + '</li>';
+                            hotelDiv += '<li id="hmoney">' + hotelsarray[i + 4] + "€" + '</li>';
+                            hotelDiv += '<li id="himage"><a href="' + hotelsarray[i] + '" target="_blank" rel="noopener noreferrer"><img src="' + hotelsarray[i + 5] + '" width="460" height="400"></a></li>';
+                            hotelDiv += '<li><button id="hbutton" onclick="gethotel(\'' + hotelsarray[i + 1] + '\')">Select</button></li>';
+                            hotelDiv += '</div>';
+                            document.getElementById('myList').innerHTML += hotelDiv;
+                            hotelsarraycopy.push({
+                                url: hotelsarray[i],
+                                hotel_name: hotelsarray[i + 1],
+                                latitude: hotelsarray[i + 2],
+                                longitude: hotelsarray[i + 3],
+                                gross_price: hotelsarray[i + 4],
+                                main_photo_url: hotelsarray[i + 5]
+                            });
                         }
                     }
 
@@ -704,17 +969,67 @@
                         .then(data => savehotels(data))
                         .catch(err => console.error(err));
                 } else {
-                    alert("Incorrect value for people label!");
+                    showAlert("Incorrect value for people label!");
                 }
             } else {
-                alert("The return date must be after start date!");
+                showAlert("The return date must be after start date!");
             }
         } else {
-            alert("Incorrect value for rooms label!");
+            showAlert("Incorrect value for rooms label!");
         }
     }
 
     // ------------------------------------------------------------------------------------------------
+
+    function sortHotels() {
+        document.getElementById('myList').innerHTML = '';
+        var sortOption = document.getElementById('sortOption').value;
+        var sortedHotels = hotelsarraycopy.slice();
+
+        switch (sortOption) {
+            case 'nameAsc':
+                sortedHotels.sort(function (a, b) {
+                    var nameA = a.hotel_name.toLowerCase();
+                    var nameB = b.hotel_name.toLowerCase();
+                    return nameA.localeCompare(nameB);
+                });
+                break;
+            case 'nameDesc':
+                sortedHotels.sort(function (a, b) {
+                    var nameA = a.hotel_name.toLowerCase();
+                    var nameB = b.hotel_name.toLowerCase();
+                    return nameB.localeCompare(nameA);
+                });
+                break;
+            case 'priceAsc':
+                sortedHotels.sort(function (a, b) {
+                    var priceA = parseFloat(a.gross_price);
+                    var priceB = parseFloat(b.gross_price);
+                    return priceA - priceB;
+                });
+                break;
+            case 'priceDesc':
+                sortedHotels.sort(function (a, b) {
+                    var priceA = parseFloat(a.gross_price);
+                    var priceB = parseFloat(b.gross_price);
+                    return priceB - priceA;
+                });
+                break;
+            default:
+                break;
+        }
+        for (let i = 0; i < sortedHotels.length; i++) {
+            let hotelDiv = '';
+            hotelDiv += '<div class="blurred">';
+            hotelDiv += '<li id="hname">' + sortedHotels[i].hotel_name + '</li>';
+            hotelDiv += '<li id="hmoney">' + sortedHotels[i].gross_price + '€' + '</li>';
+            hotelDiv += '<li id="himage"><a href="' + sortedHotels[i].url + '" target="_blank" rel="noopener noreferrer"><img src="' + sortedHotels[i].main_photo_url + '" width="460" height="400"></a></li>';
+            hotelDiv += '<li><button id="hbutton" onclick="gethotel(\'' + sortedHotels[i].hotel_name + '\')">Select</button></li>';
+            hotelDiv += '</div>';
+            document.getElementById('myList').innerHTML += hotelDiv;
+        }
+    }
+
 
     // ----------------------------------- misc.js ----------------------------------------------------
     function isMobileOrTablet() {
@@ -728,42 +1043,57 @@
     // ----------------------------------- gethotel.js ------------------------------------------------
     let hotelname;
     function gethotel(e) {
-        hotelname = e.textContent;
+        hotelname = e;
         document.getElementById('popuphotels').style.display = "none";
         document.getElementById('hotelData').style.display = "none";
         document.getElementById('objectives').style.display = "block";
         document.getElementById("mySidepanel").style.filter = "none";
         document.getElementById("mySidepanelCity").style.filter = "none";
         document.getElementById("map").style.filter = "none";
+        document.getElementById("myList").innerHTML = "";
     }
 
     // ------------------------------------------------------------------------------------------------
 
     // ----------------------------------- togglemap.js -----------------------------------------------
     function togglemap() {
-        document.getElementById("detailslist").innerHTML += '<li class = "detailsstartingcity">' + document.getElementById("startingcityname").value + '</li>';
-        document.getElementById('start').valueAsDate = new Date();
-        document.getElementById('returnDate').valueAsDate = new Date();
-        document.getElementById("startdiv").style.display = "none";
-        document.getElementById("mySidepanel").style.display = "none";
-        document.getElementById("mySidepanelCity").style.display = "block";
-        document.getElementById("map").style.display = "block";
-        map.resize();
-        homecity = document.getElementById("startingcityname").value;
-        document.getElementById('citylist').innerHTML += '<li id = "listelement">' + homecity + '</li>';
+        if(cities.includes(document.getElementById("startingcityname").value)) {
+            document.getElementById("detailslist").innerHTML += '<li class = "detailsstartingcity">' + document.getElementById("startingcityname").value + '</li>';
+            document.getElementById('start').valueAsDate = new Date();
+            document.getElementById('returnDate').valueAsDate = new Date();
+            document.getElementById("startdiv").style.display = "none";
+            document.getElementById("mySidepanel").style.display = "none";
+            document.getElementById("mySidepanelCity").style.display = "block";
+            document.getElementById("map").style.display = "block";
+            map.resize();
+            homecity = document.getElementById("startingcityname").value;
+            document.getElementById('citylist').innerHTML += '<li id = "listelement">' + homecity + '</li>';
+        }
+        else {
+            showAlert("City not found. Please enter a valid city name.");
+        }
     }
 
     // ------------------------------------------------------------------------------------------------
 
+
     // ----------------------------------- zoomoncity.js ----------------------------------------------
     function zoomcity() {
-        document.getElementById("mySidepanel").style.display = "block";
-        var destinationcity2 = document.getElementById('Name1').value;
-        var coordinates22index = locationsarray.indexOf(destinationcity2) + 1;
-        coordinates22 = locationsarray[coordinates22index];
-        map.flyTo({center: coordinates22, zoom: 9});
-        const elementsToRemove = document.querySelectorAll('.marker');
-        elementsToRemove.forEach(element => element.remove());
+        if(cities.includes(document.getElementById("Name1").value)) {
+            document.getElementById("mySidepanel").style.display = "block";
+            setTimeout(function() {
+                document.getElementById("mySidepanel").style.opacity = "1";
+            }, 10);
+            var destinationcity2 = document.getElementById('Name1').value;
+            var coordinates22index = locationsarray.indexOf(destinationcity2) + 1;
+            coordinates22 = locationsarray[coordinates22index];
+            map.flyTo({center: coordinates22, zoom: 9});
+            const elementsToRemove = document.querySelectorAll('.marker');
+            elementsToRemove.forEach(element => element.remove());
+        }
+        else {
+            showAlert("City not found. Please enter a valid city name.");
+        }
     }
 
     // ------------------------------------------------------------------------------------------------
