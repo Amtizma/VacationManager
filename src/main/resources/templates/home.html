@@ -140,6 +140,7 @@
     <ul id="myList" style="list-style-type:none;"></ul>
 </div>
 <script th:inline="javascript">
+    const cities = [];
     function showAlert(errorText) {
         document.getElementById("alert-message").innerHTML = errorText;
         document.getElementById("myAlert").style.display = "block";
@@ -174,7 +175,6 @@
     var destinationcity;
     const locationsarray = [];
     const cityarray = [];
-    const cities = [];
     var map = tt.map({
         key: [[${apikey}]], // this will be replaced by Thymeleaf at runtime
         container: 'map',
@@ -194,6 +194,28 @@
     var coordinates2 = [];
     const objectivelist = [];
     var objectivenumber = 0;
+
+    if(sessionStorage.length !== 0){
+        const tripListString = sessionStorage.getItem('tripList');
+        const trips = JSON.parse(tripListString);
+        document.getElementById("startingcityname").value = trips[0].startingcity;
+        togglemapstorage();
+        for (let i = 0; i < trips.length; i++) {
+            document.getElementById("detailslist").innerHTML += '<li class="detailscityname"><button class="hideButton" onclick="hideElements(this)"></button><button class="showButton" onclick="showElements(this)"></button><span class="cityImage"></span>' + trips[i].city.cityname + '</li>';
+            document.getElementById("detailslist").innerHTML += '<li class = "detailshotel">' + trips[i].city.hotel.name + '</li>';
+            document.getElementById("detailslist").innerHTML += '<li class = "detailsdate">' + trips[i].city.hotel.start_date + " to " + trips[i].city.hotel.return_date + '</li>';
+            document.getElementById("detailslist").innerHTML += '<li class = "detailspeopleandrooms">' + trips[i].city.hotel.persons + " people <img id = \"roomsnumberdetails\" src=\"https://cdn-icons-png.flaticon.com/512/1422/1422872.png\"> " + trips[i].city.hotel.rooms + " room(s) " + '</li>';
+            document.getElementById("detailslist").innerHTML += '<li class = "detailstransportation">' + trips[i].city.transport + '</li>';
+            const objectives = trips[i].city.objectives;
+            const targetList1 = document.getElementById("detailslist");
+            objectives.forEach(objective => {
+                const newItem1 = document.createElement("li");
+                newItem1.textContent = objective;
+                newItem1.classList.add("detailsobjectives");
+                targetList1.appendChild(newItem1);
+            });
+        }
+    }
 
     function addobjective1() {
         let newObjective = document.getElementById("objectivename").value;
@@ -423,12 +445,6 @@
             input.val(value);
             options.empty();
         });
-
-        input.on('blur', function() {
-            setTimeout(function() {
-                options.empty();
-            }, 100);
-        });
     });
     $(document).ready(function() {
         const input = $('#startingcityname');
@@ -449,12 +465,6 @@
             const value = $(this).text();
             input.val(value);
             options.empty();
-        });
-
-        input.on('blur', function() {
-            setTimeout(function() {
-                options.empty();
-            }, 100);
         });
     });
     //--------------------------------------------------------------------------------------------------
@@ -730,12 +740,15 @@
     // ------------------------------------------------------------------------------------------------
 
     // ----------------------------------- addcity.js -------------------------------------------------
-
+    let citylist = [];
     const listdataarray = [];
     listdataarray[0] = document.getElementById('startingcityname').value;
     var position = 1;
     var hotelcd = [];
+    let objectives = [];
+    let tripList = [];
     function route() {
+        objectives = [];
         document.getElementById("mySidepanel").style.display = "none";
         document.getElementById("listData").style.display = "block";
         setTimeout(function() {
@@ -752,6 +765,7 @@
         listItems.forEach(item => {
             const newItem = document.createElement("li");
             newItem.textContent = item.textContent;
+            objectives.push(newItem.textContent);
             newItem.classList.add("detailsobjectives");
             targetList.appendChild(newItem);
         });
@@ -765,9 +779,24 @@
                 hotelcd[1] = hotelscoordinates[i + 1];
                 hotelcd[0] = hotelscoordinates[i + 2];
                 createMarkerHotel(hotelcd, '#FF0000', hotelscoordinates[i]);
-                console.log(hotelcd);
             }
         }
+        let hotel;
+        for (let i = 0; i < hotels.length; i++) {
+            if (hotels[i].name === hotelname) {
+                hotel = hotels[i];
+                break;
+            }
+        }
+        const transport = document.getElementById("transportation").value;
+        const cityname = document.getElementById("Name1").value;
+        const city = new City(cityname, hotel, transport, objectives);
+        citylist.push(city);
+        const startcity = document.getElementById("startingcityname").value;
+        const trip = new TripList(city, startcity);
+        tripList.push(trip);
+        const tripListString = JSON.stringify(tripList);
+        sessionStorage.setItem('tripList', tripListString);
         addroute();
         cancel();
     }
@@ -893,10 +922,39 @@
     }
 
     // ------------------------------------------------------------------------------------------------
-
+    // ----------------------------------- Hotel Class ------------------------------------------------
+    class Hotel {
+        constructor(name, start_date, return_date, persons, rooms) {
+            this.name = name;
+            this.start_date = start_date;
+            this.return_date = return_date;
+            this.persons = persons;
+            this.rooms = rooms;
+        }
+    }
+    // ------------------------------------------------------------------------------------------------
+    // ----------------------------------- City Class -------------------------------------------------
+    class City {
+        constructor(cityname,hotel, transport, objectives) {
+            this.cityname = cityname;
+            this.hotel = hotel;
+            this.transport = transport;
+            this.objectives = objectives;
+        }
+    }
+    // -------------------------------------------------------------------------------------------------
+    // ----------------------------------- City TripList -------------------------------------------------
+    class TripList {
+        constructor(city, startingcity) {
+            this.city = city;
+            this.startingcity = startingcity;
+        }
+    }
+    // -------------------------------------------------------------------------------------------------
     // ----------------------------------- searchhotel.js ----------------------------------------------
     const hotelscoordinates = [];
     let hotelsarraycopy = [];
+    const hotels = [];
     function toggleTable() {
         if (!document.getElementById("rooms").value.startsWith("0") && document.getElementById("rooms").value !== "") {
             if (document.getElementById("start").value < document.getElementById("returnDate").value) {
@@ -927,7 +985,15 @@
                             if (values[i] == "gross_amount_hotel_currency" && values[i + 1] == ":{" && values[i + 2] == "value") gross_price = values[i + 3].substring(1).replace('}', ' ').replace(',', ' ');
                             if (values[i] == "gross_amount_hotel_currency" && values[i + 1] == ":{" && values[i + 2] == "currency" && values[i + 3] == ":" && values[i + 4] == "EUR" && values[i + 5] == "," && values[i + 6] == "value") gross_price = values[i + 7].substring(1).replace('}', ' ').replace(',', ' ');
                             if (values[i] == "max_photo_url") main_photo_url = values[i + 2];
-                            if (values[i] == "max_1440_photo_url") hotelsarray.push(url, hotel_name, latitude, longitude, gross_price, main_photo_url);
+                            if (values[i] == "max_1440_photo_url") {
+                                const startdate = document.getElementById("start").value;
+                                const returndate = document.getElementById("returnDate").value;
+                                const person = document.getElementById("people").value;
+                                const rooms = document.getElementById("rooms").value;
+                                const hotel = new Hotel(hotel_name, startdate, returndate,person, rooms);
+                                hotels.push(hotel);
+                                hotelsarray.push(url, hotel_name, latitude, longitude, gross_price, main_photo_url);
+                            }
                             if (values[i] == "max_1440_photo_url") hotelscoordinates.push(hotel_name, latitude, longitude);
                         }
                         for (let i = 0; i < hotelsarray.length; i = i + 6) {
@@ -1056,6 +1122,18 @@
     // ------------------------------------------------------------------------------------------------
 
     // ----------------------------------- togglemap.js -----------------------------------------------
+    function togglemapstorage(){
+        document.getElementById("detailslist").innerHTML += '<li class = "detailsstartingcity">' + document.getElementById("startingcityname").value + '</li>';
+        document.getElementById('start').valueAsDate = new Date();
+        document.getElementById('returnDate').valueAsDate = new Date();
+        document.getElementById("startdiv").style.display = "none";
+        document.getElementById("mySidepanel").style.display = "none";
+        document.getElementById("mySidepanelCity").style.display = "block";
+        document.getElementById("map").style.display = "block";
+        map.resize();
+        homecity = document.getElementById("startingcityname").value;
+        document.getElementById('citylist').innerHTML += '<li id = "listelement">' + homecity + '</li>';
+    }
     function togglemap() {
         if(cities.includes(document.getElementById("startingcityname").value)) {
             document.getElementById("detailslist").innerHTML += '<li class = "detailsstartingcity">' + document.getElementById("startingcityname").value + '</li>';
